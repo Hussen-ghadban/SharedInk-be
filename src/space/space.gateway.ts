@@ -1,4 +1,5 @@
 // src/space/space.gateway.ts
+import { Injectable } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+@Injectable()
 @WebSocketGateway({
   cors: {
     origin: '*',
