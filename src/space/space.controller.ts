@@ -8,6 +8,7 @@ import {
   Patch,
   Req,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { SpaceService } from './space.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
@@ -35,7 +36,7 @@ export class SpaceController {
     return this.spaceService.getSpaceById(id);
   }
 
-  @Patch(':id/content')
+  @Put(':id/content')
   updateContent(@Param('id') id: string, @Body() body: { content: string }, @Req() req: any) {
     return this.spaceService.updateContent(id, body.content,req.user.id);
   }

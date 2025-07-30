@@ -1,9 +1,10 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { SpaceGateway } from './space.gateway';
 
 @Injectable()
 export class SpaceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,private spaceGateway: SpaceGateway,) {}
 
   async createSpace(title: string, ownerId: string) {
     return await this.prisma.space.create({
@@ -63,7 +64,7 @@ async updateContent(spaceId: string, content: string, userId: string) {
     throw new ForbiddenException('You are not allowed to edit this space');
   }
 
-  return this.prisma.space.update({
+  const updatedSpace = await this.prisma.space.update({
     where: { id: spaceId }, 
     data: { content },
     include: {
@@ -71,6 +72,14 @@ async updateContent(spaceId: string, content: string, userId: string) {
       collaborators: true,
     },
   });
+  
+    // Emit real-time update to other users in the space room
+    this.spaceGateway.server.to(spaceId).emit('spaceUpdated', {
+      content,
+      spaceId,
+    });
+
+    return updatedSpace;
 }
 
 }
