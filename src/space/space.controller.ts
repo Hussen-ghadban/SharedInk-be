@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Post,
@@ -13,6 +14,7 @@ import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller('spaces')
 @UseGuards(JwtAuthGuard)
+
 export class SpaceController {
   constructor(private spaceService: SpaceService) {}
 
@@ -28,18 +30,13 @@ export class SpaceController {
     return this.spaceService.getSpaces(ownerId);
   }
 
-  @Post(':id/invite')
-  inviteUser(@Param('id') id: string, @Body() body: { email: string }) {
-    return this.spaceService.inviteUser(id, body.email);
-  }
-
   @Get(':id')
   getSpace(@Param('id') id: string) {
     return this.spaceService.getSpaceById(id);
   }
 
   @Patch(':id/content')
-  updateContent(@Param('id') id: string, @Body() body: { content: string }) {
-    return this.spaceService.updateContent(id, body.content);
+  updateContent(@Param('id') id: string, @Body() body: { content: string }, @Req() req: any) {
+    return this.spaceService.updateContent(id, body.content,req.user.id);
   }
 }
