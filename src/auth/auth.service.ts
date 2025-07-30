@@ -41,7 +41,7 @@ export class AuthService {
       { sub: user.id, email: user.email },
       {
         secret: this.config.get('JWT_SECRET'),
-        expiresIn: '1h',
+        expiresIn: '20h',
       },
     );
 
