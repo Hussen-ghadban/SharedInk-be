@@ -24,10 +24,10 @@ export class SpaceService {
     })
     return spaces;
   }
-  async inviteUser(spaceId: string, userId: string) {
+  async inviteUser(spaceId: string, email: string) {
     const [space, user] = await Promise.all([
       this.prisma.space.findUnique({ where: { id: spaceId } }),
-      this.prisma.user.findUnique({ where: { id: userId } })
+      this.prisma.user.findUnique({ where: { email } })
     ]);
 
     if (!space) throw new NotFoundException('Space not found');
@@ -37,7 +37,7 @@ export class SpaceService {
       where: { id: spaceId },
       data: {
         collaborators: {
-          connect: { id: userId },
+          connect: { id: user.id },
         },
       },
       include: {

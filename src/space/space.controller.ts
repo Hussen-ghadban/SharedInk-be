@@ -29,8 +29,8 @@ export class SpaceController {
   }
 
   @Post(':id/invite')
-  inviteUser(@Param('id') id: string, @Body() body: { userId: string }) {
-    return this.spaceService.inviteUser(id, body.userId);
+  inviteUser(@Param('id') id: string, @Body() body: { email: string }) {
+    return this.spaceService.inviteUser(id, body.email);
   }
 
   @Get(':id')
