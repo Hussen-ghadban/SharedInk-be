@@ -23,7 +23,7 @@ export class InviteController {
   async invite(
     @Body() body: { email: string},
     @Param('id') id: string,
-    @Req() req: any // assume req.user is populated by auth middleware
+    @Req() req: any
   ) {
     return this.inviteService.createInvite(body.email, id, req.user.id);
   }
@@ -41,7 +41,7 @@ export class InviteController {
 
   @Get()
   async getMyInvites(@Req() req: any) {
-    return this.inviteService.getInvitesForUser(req.user.email);
+    return this.inviteService.getInvitesForUser(req.user.id);
   }
   @Delete(':id')
   async deleteInvite(@Req()req:any,@Param('id')id:string){
