@@ -85,10 +85,18 @@ export class InviteService {
     });
   }
 
-  async getInvitesForUser(email: string) {
+  async getInvitesForUser(id: string) {
+    const user=await this.prisma.user.findUnique({
+        where:{id}
+    })
+    if(!user){
+        throw new NotFoundException('User not found.');
+    }
+
+    // console.log("email",email)
     return this.prisma.invitation.findMany({
       where: {
-        email,
+        email:user.email,
         status: 'PENDING',
       },
       include: {

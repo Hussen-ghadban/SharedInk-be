@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -6,7 +6,7 @@ export class SpaceService {
   constructor(private prisma: PrismaService) {}
 
   async createSpace(title: string, ownerId: string) {
-    return this.prisma.space.create({
+    return await this.prisma.space.create({
       data: {
         title,
         ownerId,
@@ -20,31 +20,18 @@ export class SpaceService {
   }
   async getSpaces(ownerId:string){
     const spaces=await this.prisma.space.findMany({
-        where:{ownerId:ownerId}
+        where:{
+          OR:[
+            {ownerId:ownerId},
+            {collaborators:{
+              some:{
+                id:ownerId
+              }
+            }}
+        ] 
+      }
     })
     return spaces;
-  }
-  async inviteUser(spaceId: string, email: string) {
-    const [space, user] = await Promise.all([
-      this.prisma.space.findUnique({ where: { id: spaceId } }),
-      this.prisma.user.findUnique({ where: { email } })
-    ]);
-
-    if (!space) throw new NotFoundException('Space not found');
-    if (!user) throw new NotFoundException('User not found');
-
-    return this.prisma.space.update({
-      where: { id: spaceId },
-      data: {
-        collaborators: {
-          connect: { id: user.id },
-        },
-      },
-      include: {
-        owner: true,
-        collaborators: true,
-      },
-    });
   }
 
   async getSpaceById(spaceId: string) {
@@ -59,19 +46,31 @@ export class SpaceService {
     return space;
   }
 
-  async updateContent(spaceId: string, content: string) {
-    const space = await this.prisma.space.findUnique({
-      where: { id: spaceId }
-    });
-    if (!space) throw new NotFoundException('Space not found');
+async updateContent(spaceId: string, content: string, userId: string) {
+  const space = await this.prisma.space.findUnique({
+    where: { id: spaceId },
+    include: { collaborators: true },
+  });
 
-    return this.prisma.space.update({
-      where: { id: spaceId },
-      data: { content },
-      include: {
-        owner: true,
-        collaborators: true,
-      },
-    });
+  if (!space) {
+    throw new NotFoundException('Space not found');
   }
+
+  const isOwner = space.ownerId === userId;
+  const isCollaborator = space.collaborators.some(user => user.id === userId);
+
+  if (!isOwner && !isCollaborator) {
+    throw new ForbiddenException('You are not allowed to edit this space');
+  }
+
+  return this.prisma.space.update({
+    where: { id: spaceId }, 
+    data: { content },
+    include: {
+      owner: true,
+      collaborators: true,
+    },
+  });
+}
+
 }
