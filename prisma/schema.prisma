@@ -20,6 +20,7 @@ model User {
   createdAt DateTime @default(now())
   spaces    Space[]  @relation("Collaborators")
   ownedSpaces Space[] @relation("Owner")
+  Invitation Invitation[]
 }
 
 model Space {
@@ -29,5 +30,24 @@ model Space {
   owner        User     @relation("Owner", fields: [ownerId], references: [id])
   ownerId      String
   collaborators User[]  @relation("Collaborators")
+  invitation Invitation[] 
   createdAt    DateTime @default(now())
+}
+model Invitation {
+  id          String       @id @default(cuid())
+  email       String
+  space       Space        @relation(fields: [spaceId], references: [id])
+  spaceId     String
+  invitedBy   User         @relation(fields: [invitedById], references: [id])
+  invitedById String
+  status      InviteStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+
+  @@unique([email, spaceId])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
