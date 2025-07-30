@@ -9,6 +9,7 @@ import {
   Get,
   Delete,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 
 
@@ -32,13 +33,18 @@ export class InviteController {
     return this.inviteService.acceptInvite(id, req.user.id);
   }
 
-  @Delete(':id/reject')
-  async reject(@Param('id') id: string) {
-    return this.inviteService.rejectInvite(id);
+  @Put(':id/reject')
+  async reject(@Param('id') id: string,
+ @Req() req: any) {
+    return this.inviteService.rejectInvite(id,req.user.id);
   }
 
   @Get()
   async getMyInvites(@Req() req: any) {
     return this.inviteService.getInvitesForUser(req.user.email);
+  }
+  @Delete(':id')
+  async deleteInvite(@Req()req:any,@Param('id')id:string){
+    return this.inviteService.deleteInvite(req.user.id,id);
   }
 }
