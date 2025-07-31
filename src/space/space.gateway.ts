@@ -46,19 +46,4 @@ export class SpaceGateway
     console.log(`Client ${client.id} joined space ${spaceId}`);
   }
 
-  // When someone writes something
-  @SubscribeMessage('spaceUpdate')
-  handleSpaceUpdate(
-    @MessageBody()
-    data: {
-      spaceId: string;
-      content: string;
-    },
-    @ConnectedSocket() client: Socket,
-  ) {
-    // Broadcast to everyone in the same room except sender
-    client.to(data.spaceId).emit('spaceUpdated', {
-      content: data.content,
-    });
-  }
 }
