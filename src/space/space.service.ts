@@ -30,7 +30,15 @@ export class SpaceService {
               }
             }}
         ] 
-      }
+      },
+include: {
+  owner: {
+    select: { username: true },
+  },
+  // collaborators: {
+  //   select: { id: true, username: true, email: true },
+  // },
+},
     })
     return spaces;
   }

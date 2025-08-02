@@ -31,14 +31,14 @@ export class AuthService {
     };
   }
 
-  async signin(email: string, password: string) {
+  async signin(email: string, password: string) { 
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const token = await this.jwt.signAsync(
-      { id: user.id, email: user.email },
+      { id: user.id, username: user.username },
       {
         secret: this.config.get('JWT_SECRET'),
         expiresIn: '20h',
@@ -53,5 +53,15 @@ export class AuthService {
         email: user.email,
       },
     };
+  }
+  async getuser(userId:string){
+    return await this.prisma.user.findUnique({
+      where:{id:userId},
+      select:{
+        id:true,
+        email:true,
+        username:true
+      }
+    })
   }
 }
