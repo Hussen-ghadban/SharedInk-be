@@ -13,7 +13,6 @@ export class AuthController {
 
   @Post('signin')
   signin(@Body() body: { email: string; password: string }) {
-    console.log("loggin in")
     return this.authService.signin(body.email, body.password);
   }
 
