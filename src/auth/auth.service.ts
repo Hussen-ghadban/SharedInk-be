@@ -12,13 +12,14 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async signup(username:string, email: string, password: string) {
+  async signup(username:string, email: string, password: string,profile:string) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
+        profile,
       },
     });
 
@@ -56,7 +57,8 @@ export class AuthService {
       select:{
         id:true,
         email:true,
-        username:true
+        username:true,
+        profile:true,
       }
     })
   }
